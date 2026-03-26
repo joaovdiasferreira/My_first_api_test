@@ -69,10 +69,7 @@ def home():
 
 @app.get("/sales", response_model=list[SaleResponse])
 def get_sales():
-    result = []
-    for sale_id, sale in sales.items():
-        result.append({"id": sale_id, **sale})
-    return result
+    return [{"id": sale_id, **sale} for sale_id, sale in sales.items()]
 
 @app.get("/sales/{sale_id}", response_model=SaleResponse)
 def get_sale(sale_id: int):
@@ -97,18 +94,9 @@ def create_sale(sale: SaleCreate):
     }
     return {"id": sale_id, **sales[sale_id]}
 
-#DELETE a sale
-@app.delete("/sales/{sale_id}")
-def delete_sale(sale_id: int):
-    if sale_id not in sales:
-        raise HTTPException(status_code=404, detail="Sale not found")
-    sales.pop(sale_id) #pop() returns what was deleted
-    #del sales[sale_id] is possible, but it not returns anything
-    return {"id": sale_id, "message": "Sale deleted!"}
 
-
-#UPDATE a sale (PUT)
 @app.put("/sales/{sale_id}", response_model=SaleResponse)
+#UPDATE a sale (PUT)
 def update_sale(sale_id: int, sale: SaleCreate):
     if sale_id not in sales:
         raise HTTPException(status_code=404, detail="Sale not found")
@@ -121,3 +109,13 @@ def update_sale(sale_id: int, sale: SaleCreate):
         "total": total
     }
     return {"id": sale_id, **sales[sale_id]}
+
+
+#DELETE a sale
+@app.delete("/sales/{sale_id}")
+def delete_sale(sale_id: int):
+    if sale_id not in sales:
+        raise HTTPException(status_code=404, detail="Sale not found")
+    deleted = sales.pop(sale_id) #pop() returns what was deleted
+    #del sales[sale_id] is possible, but it not returns anything
+    return {"message": "Sale deleted!", "data":{"id": sale_id, **deleted}}
