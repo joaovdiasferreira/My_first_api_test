@@ -5,13 +5,13 @@ app = FastAPI()
 
 #Model
 class Sale(BaseModel):
-    product: str
+    product: str = Field(min_length=1, max_length=100)
     price: float = Field(gt=0)
     quantity: int = Field(gt=0)
-
+    #Field helps to limit space usage or possible errors
 
 #Fake database
-sales = {
+sales: dict[int, dict[str, float | int | str]] = { #This turns the dict a bit restrictive
     1: {
         "product": "Keyboard",
         "price": 150.0,
@@ -49,12 +49,12 @@ def get_sales():
     return sales
 
 @app.get("/sales/{sale_id}")
-def get_sale(sale_id: int):
+def get_sale(sale_id: int) -> dict:
+    sale = sales.get(sale_id)
     if sale_id not in sales:
         raise HTTPException(status_code=404, detail="Sale not found")
         #This prevents KeyError if a sale is not found
-
-    return sales[sale_id]
+    return sale
 
 
 #CREAT a sale (POST)
