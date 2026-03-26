@@ -66,7 +66,7 @@ def create_sale(sale: Sale):
     sales[sale_id]= {
         "product": sale.product,
         "price": sale.price,
-        "quantit": sale.quantity,
+        "quantity": sale.quantity,
         "total": total
     }
     return {"id": sale_id, "sale": sales[sale_id]}
